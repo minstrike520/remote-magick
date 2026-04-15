@@ -27,11 +27,24 @@ def main():
     # 假設指令 A 的子目錄為 dist/img
     remote_dist_img = f"{remote_dist}/img"
 
-    # 1. 指定本地檔案
-    if len(sys.argv) < 2:
-        print("用法: python convert.py <file1> <file2> ...")
+    # 1. 指定本地檔案與 resize 選項
+    if len(sys.argv) < 3:
+        print("用法: python convert.py <resize_option> <file1> <file2> ...")
+        print("選項 (resize_option): a4-vertical, a4-horizontal, 16-9")
         return
-    local_files = sys.argv[1:]
+    
+    resize_option = sys.argv[1]
+    resize_map = {
+        "a4-vertical": "2480x3508",
+        "a4-horizontal": "3508x2480",
+        "16-9": "3840x2160"
+    }
+    if resize_option not in resize_map:
+        print(f"無效的選項 '{resize_option}'，請使用: a4-vertical, a4-horizontal, 16-9")
+        return
+    
+    resize_dim = resize_map[resize_option]
+    local_files = sys.argv[2:]
 
     # 2. 清理遠端資料夾 (含確認機制)
     # 建立目錄確保路徑存在，並清空內容
@@ -55,12 +68,12 @@ def main():
 
     # 4. 指令 A: 逐一轉換
     # 在遠端使用 shell loop 處理
-    print(f"\n[Step 4] 執行指令 A (圖片轉換)...")
+    print(f"\n[Step 4] 執行指令 A (圖片轉換為 {resize_dim})...")
     cmd_a = (
         f"ssh {host} \"for f in {remote_src}/*; do "
         f"filename=\\$(basename \\\"\\$f\\\"); "
-        f"magick \\\"\\$f\\\" -define jpeg:extent=400kb -resize 2480x3508 "
-        f"-background white -gravity center -extent 2480x3508 "
+        f"magick \\\"\\$f\\\" -define jpeg:extent=400kb -resize {resize_dim} "
+        f"-background white -gravity center -extent {resize_dim} "
         f"\\\"{remote_dist_img}/\\${{filename}}\\\"; "
         f"done\""
     )
