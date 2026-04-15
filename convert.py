@@ -72,9 +72,11 @@ def main():
     cmd_a = (
         f"ssh {host} \"for f in {remote_src}/*; do "
         f"filename=\\$(basename \\\"\\$f\\\"); "
+        f"echo \\\"Converting \\${{filename}}...\\\"; "
         f"magick \\\"\\$f\\\" -define jpeg:extent=400kb -resize {resize_dim} "
         f"-background white -gravity center -extent {resize_dim} "
         f"\\\"{remote_dist_img}/\\${{filename}}\\\"; "
+        f"echo \\\"Success \\${{filename}}\\\"; "
         f"done\""
     )
     run_command(cmd_a, shell=True)
