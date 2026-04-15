@@ -1,0 +1,5 @@
+{
+    "host": "user@host",
+    "input": "/home/user/app/image-to-pdf/src/",
+    "output": "/home/user/app/image-to-pdf/dist/"
+}
